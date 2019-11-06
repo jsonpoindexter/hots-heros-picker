@@ -27,7 +27,7 @@ export default new Vuex.Store<RootState>({
     session: '',
     heros: JSON.parse(JSON.stringify(defaultHeros)),
     user: { name: 'muffinsticks', team: Team.red, selectedId: 0 },
-    players: [{ name: 'foo', team: Team.blue, selectedId: 1 }, { name: 'boo', team: Team.blue, selectedId: 2 }, { name: 'woo', team: Team.red, selectedId: 3 }],
+    players: [{ name: 'foo', team: Team.blue, selectedId: 1 }, { name: 'boo', team: Team.blue, selectedId: 2 }, { name: 'woo', team: Team.red, selectedId: 3 }, { name: 'boo', team: Team.blue, selectedId: 4 }, { name: 'boo', team: Team.blue, selectedId: 5 }, { name: 'boo', team: Team.blue, selectedId: 6 }, { name: 'boo', team: Team.blue, selectedId: 7 }],
   },
   mutations: {
     selectHero({ user, heros }, heroId: number) {

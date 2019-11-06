@@ -7,9 +7,12 @@
     </thead>
     <tbody>
       <tr></tr>
-      <tr v-for="i in 5" style="color: white;">
-        <td style="background: red">{{ redPlayers[i - 1] ? redPlayers[i - 1].name : 'empty' }}</td>
-        <td style="background: blue">{{ bluePlayers[i - 1] ? bluePlayers[i - 1].name : 'empty' }}</td>
+      <tr v-for="(_, index) in 10" style="color: white;">
+        <!-- Allow for 10 players to be on a team, but only show empty up to 5  -->
+        <td v-if="index <= 4|| redPlayers[index] && index > 4" style="background: red">{{ redPlayers[index] ? (redPlayers[index].name + ' - ' + $store.state.heros[redPlayers[index].selectedId].name) : 'empty' }}</td>
+        <td v-else></td>
+        <td v-if="index <= 4|| bluePlayers[index] && index > 4 " style="background: blue">{{ bluePlayers[index] ? (bluePlayers[index].name + ' - ' + $store.state.heros[bluePlayers[index].selectedId].name) : 'empty'}}</td>
+        <td v-else></td>
       </tr>
     </tbody>
   </table>
