@@ -14,7 +14,7 @@ const instance = axios.create({
 interface RootState {
   session: string
   heros: Hero[]
-  user: Player | null
+  user: Player
   players: Player[]
 }
 
@@ -26,54 +26,45 @@ export default new Vuex.Store<RootState>({
     // Draft session
     session: '',
     heros: JSON.parse(JSON.stringify(defaultHeros)),
-    user: { name: 'muffinsticks', team: Team.red, selectedId: null },
-    players: [],
+    user: { name: 'muffinsticks', team: Team.red, selectedId: 0 },
+    players: [{ name: 'foo', team: Team.blue, selectedId: 1 }, { name: 'boo', team: Team.blue, selectedId: 2 }, { name: 'woo', team: Team.red, selectedId: 3 }],
   },
   mutations: {
-    selected({ user, heros}, heroId: number) {
-      heros[heroId].selected = !heros[heroId].selected
-      // Reset user selected if 'false'
-      user!.selectedId = heros[heroId].selected ? heroId : null
+    selectHero({ user, heros }, heroId: number) {
+      user.selectedId = user.selectedId === heroId ? null : heroId
     },
     team({ user }, team: Team) {
       if (user) user.team = team
     },
-    resetHeros({user, heros}) {
+    resetHeros({ user, heros }) {
       if (user) user.selectedId = null
       heros = JSON.parse(JSON.stringify(defaultHeros))
     },
-    resetUserSelected({user, heros}) {
+    resetUserSelected({ user, heros }) {
       if (user && user.selectedId) {
-        heros[
-          heros.findIndex((hero: Hero) => {
-            // @ts-ignore
-            return hero.urlName === selected.urlName
-          })
-        ].selected = false
         user.selectedId = null
       }
     },
-    username({user}, username: string) {
+    username({ user }, username: string) {
       if (user) user.name = username
     },
   },
   actions: {
     // Select team color
     updateTeam(context: any, team: Team) {
-      context.commit('resetUserSelected')
+      // context.commit('resetUserSelected')
       context.commit('team', team)
       instance.post(`/player/team/${Team[team]}`)
     },
 
     // Select / Deselect heros
-    updateSelected({getters, commit}, heroId: number) {
-      // Only allow one selection of hero
-      if (getters.selectedHero && getters.selectedHero.selected) {
-        return
-      }
-      commit('selected', heroId)
-      const url = `/hero/select/${getters.selectedHero.urlName}/`
-      getters.selectedHero.selected ? instance.post(url) : instance.delete(url)
+    updateSelected({ getters, commit, state: { heros, user, players } }, heroId: number) {
+      // Check if User is trying to select a hero thas has been selected by another player
+      const otherPlayerHeros = players.map((player: Player) => player.selectedId)
+      if (otherPlayerHeros.includes(heroId)) return
+      commit('selectHero', heroId)
+      const url = `/hero/select/${heros[heroId].urlName}/`
+      user.selectedId ? instance.post(url) : instance.delete(url)
     },
     // Ban / UnBan heros
     updateBanned(context: any, payload: Payload) {
@@ -96,9 +87,9 @@ export default new Vuex.Store<RootState>({
   getters: {
     // hero that the User has selcted
     selectedHero({ user, heros }) {
-      return user && user.selectedId && heros[user.selectedId] || null
+      return (user && user.selectedId && heros[user.selectedId]) || null
     },
-    players({user, players}) {
+    players({ user, players }) {
       return [user, ...players]
     },
     // redPlayers() {

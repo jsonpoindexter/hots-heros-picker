@@ -6,8 +6,6 @@ export interface Payload {
 export interface Hero {
   name: string
   urlName: string
-  selected: boolean
-  banned: boolean
 }
 
 export enum Team {

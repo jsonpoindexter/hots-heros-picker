@@ -25,6 +25,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
+import { Player, Team } from '@/store/types'
 
 @Component
 export default class Hero extends Vue {
@@ -32,12 +33,17 @@ export default class Hero extends Vue {
   @Prop() private urlName!: string
   @Prop() private selected!: boolean
   @Prop() private disabled!: boolean
-  @Prop() private team!: boolean
-
+  @Prop() private heroId!: number
   private onSelect() {
-    if (!this.disabled ) {
-      this.$store.dispatch('updateSelected', { name: this.name, urlName: this.urlName, selected: !this.selected })
+    if (!this.disabled) {
+      this.$store.dispatch('updateSelected', this.heroId)
     }
+  }
+  get team() {
+    const player = this.$store.getters.players.find((player: Player) => {
+      return player.selectedId === this.heroId
+    })
+    return player ? Team[player.team] : null
   }
 }
 </script>

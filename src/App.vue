@@ -5,12 +5,12 @@
     <TeamPanel />
     <div class="heros">
       <Hero
-        v-for="hero in heros"
+        v-for="(hero, index) in heros"
         :name="hero.name"
         :url-name="hero.urlName"
-        :selected="hero.selected"
+        :selected="selectedHerosId.includes(index)"
         :disabled="!hasMinData"
-        :team="team"
+        :heroId="index"
         :key="hero.name"
       />
     </div>
@@ -36,11 +36,13 @@ export default class App extends Vue {
   }
 
   get selectedHerosId() {
+    // let selectedHeroIds: number[] = []
+    // this.$store.getters.players.forEach((player: Player) => {
+    //  if( player.selectedId) selectedHeroIds.push(player.selectedId)
+    // })
+    // console.log(selectedHeroIds)
+    // return selectedHeroIds
     return this.$store.getters.players.map((player: Player) => player.selectedId)
-  }
-
-  get team() {
-    return this.$store.state.user ? Team[this.$store.state.user.team] : null
   }
 
   get hasUsername() {
@@ -49,6 +51,10 @@ export default class App extends Vue {
   // Has filled out username and picked a team
   get hasMinData() {
     return this.hasUsername && this.team
+  }
+
+  get team() {
+    return this.$store.state.user.team !== null
   }
 }
 </script>
