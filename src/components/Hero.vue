@@ -1,28 +1,30 @@
 <template>
-  <div
-    class="HeroItem-container"
-    @click="onSelect"
-    :class="{ disabled: disabled || selected || banned }"
-    :style="{ background: selected ? Team[player.team] : null, color: selected ? 'white' : null }"
-  >
-    <div class="CircleIcon">
-      <a >
-        <img
-          alt="hero image"
-          :class="{ disabled: disabled }"
-          :src="
-            'https://static.heroesofthestorm.com/gd/3a87a62680f43b26f7dd3d203b77e8cd/heroes/' +
-              urlName +
-              '/circleIcon.png'
-          "
-        />
-      </a>
+  <div @click="onSelect">
+    <div
+      class="HeroItem-container"
+      :class="{ disabled: disabled || selected || banned }"
+      :style="{ background: selected ? Team[player.team] : null, color: selected ? 'white' : null }"
+    >
+      <div class="CircleIcon">
+        <a>
+          <img
+            alt="hero image"
+            :class="{ disabled: disabled }"
+            :src="
+              'https://static.heroesofthestorm.com/gd/3a87a62680f43b26f7dd3d203b77e8cd/heroes/' +
+                urlName +
+                '/circleIcon.png'
+            "
+          />
+        </a>
+      </div>
+      <h5 class="HeroName-text">{{ selected ? player.name : name }}</h5>
+      <div v-show="disabled" class="image-overlay"></div>
+      <div v-show="$store.getters.bannedHeroIds.includes(heroId)" class="image-overlay">
+        <span class="banned-text">BANNED</span>
+      </div>
+      <div v-if="!selected && !banned" class="banIcon" @click="onBan">BAN</div>
     </div>
-    <h5 class="HeroName-text ">{{ name }}</h5>
-    <div v-show="disabled" class="image-overlay"></div>
-    <div v-show="$store.getters.bannedHeroIds.includes(heroId)" class="image-overlay"><span class="banned-text">BANNED</span></div>
-    <div v-if="selected" class="banIcon" @click="onBan">{{ }}</div>
-    <div v-if="!selected && !banned" class="banIcon" @click="onBan">BAN</div>
   </div>
 </template>
 
@@ -53,7 +55,7 @@ export default class Hero extends Vue {
   }
 
   get player() {
-   return this.$store.getters.players.find((player: Player) => {
+    return this.$store.getters.players.find((player: Player) => {
       return player.selectedId === this.heroId
     })
   }
@@ -102,8 +104,8 @@ export default class Hero extends Vue {
   left: 0;
   position: absolute;
   padding: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-  }
+  background-color: rgba(0, 0, 0, 0.5);
+}
 .selected {
   background-color: rgba(0,0,0,.5);
 }
@@ -144,21 +146,21 @@ export default class Hero extends Vue {
   box-shadow: inset 0px 0px 10px 2px rgba(0, 128, 255, 0.5);
   border: 2px solid rgba(51, 128, 204, 0.8);
 }
-.HeroItem-container:hover .CircleIcon.selected a::after {
-  background: none;
-  background-image: -webkit-gradient(
-    linear,
-    left bottom,
-    left top,
-    from(rgba(71, 153, 235, 0.5)),
-    color-stop(30%, rgba(71, 153, 235, 0))
-  );
-  background-image: linear-gradient(
-    to top,
-    rgba(71, 153, 235, 0.5) 0%,
-    rgba(71, 153, 235, 0) 30%
-  );
-}
+/*.HeroItem-container:hover .CircleIcon.selected a::after {*/
+/*  background: none;*/
+/*  background-image: -webkit-gradient(*/
+/*    linear,*/
+/*    left bottom,*/
+/*    left top,*/
+/*    from(rgba(71, 153, 235, 0.5)),*/
+/*    color-stop(30%, rgba(71, 153, 235, 0))*/
+/*  );*/
+/*  background-image: linear-gradient(*/
+/*    to top,*/
+/*    rgba(71, 153, 235, 0.5) 0%,*/
+/*    rgba(71, 153, 235, 0) 30%*/
+/*  );*/
+/*}*/
 
 .CircleIcon {
   display: inline-block;
