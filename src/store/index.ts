@@ -26,13 +26,13 @@ export default new Vuex.Store<RootState>({
     // Draft session
     session: '',
     heros: JSON.parse(JSON.stringify(defaultHeros)),
-    user: { name: 'muffinsticks', team: Team.red, selectedId: 0, bannedIds: [] },
+    user: { name: 'muffinsticks', team: Team.red, selectedId: 0, bannedIds: [2, 3] },
     players: [
-      { name: 'flippy', team: Team.blue, selectedId: 1, bannedIds: [] },
+      { name: 'flippy', team: Team.blue, selectedId: 1, bannedIds: [9] },
       { name: 'NoG0D', team: Team.blue, selectedId: 24, bannedIds: [] },
-      { name: 'terminator', team: Team.red, selectedId: 15, bannedIds: [] },
+      { name: 'terminator', team: Team.red, selectedId: 15, bannedIds: [10] },
       { name: 'spudly42', team: Team.blue, selectedId: 4, bannedIds: [] },
-      { name: 'rgam42', team: Team.blue, selectedId: 8, bannedIds: [] },
+      { name: 'rgam42', team: Team.blue, selectedId: 8, bannedIds: [23] },
       { name: 'pattykakes42', team: Team.blue, selectedId: 45, bannedIds: [] },
       { name: 'loser', team: Team.blue, selectedId: 29, bannedIds: [] },
     ],
@@ -41,7 +41,7 @@ export default new Vuex.Store<RootState>({
     selectHero({ user }, heroId: number) {
       user.selectedId = user.selectedId === heroId ? null : heroId
     },
-    banHero({user: { bannedIds }}, heroId: number) {
+    banHero({ user: { bannedIds } }, heroId: number) {
       const index = bannedIds.findIndex((id: number) => id === heroId)
       index >= 0 ? bannedIds.splice(index, 1) : bannedIds.push(heroId)
     },
@@ -71,7 +71,7 @@ export default new Vuex.Store<RootState>({
     },
 
     // Select / Deselect heros
-    updateSelected({ getters: { bannedHeroIds}, commit, state: { heros, user, players } }, heroId: number) {
+    updateSelected({ getters: { bannedHeroIds }, commit, state: { heros, user, players } }, heroId: number) {
       // Check if User is trying to select a hero thas has been selected by another player
       const otherPlayerHeros = players.map((player: Player) => player.selectedId)
       if (otherPlayerHeros.includes(heroId)) return

@@ -2,11 +2,11 @@
   <div
     class="HeroItem-container"
     @click="onSelect"
-    :class="{ disabled: disabled }"
-    :style="{ background: selected ? team : null }"
+    :class="{ disabled: disabled || selected || banned }"
+    :style="{ background: selected ? Team[player.team] : null, color: selected ? 'white' : null }"
   >
     <div class="CircleIcon">
-      <a>
+      <a >
         <img
           alt="hero image"
           :class="{ disabled: disabled }"
@@ -21,7 +21,8 @@
     <h5 class="HeroName-text ">{{ name }}</h5>
     <div v-show="disabled" class="image-overlay"></div>
     <div v-show="$store.getters.bannedHeroIds.includes(heroId)" class="image-overlay"><span class="banned-text">BANNED</span></div>
-    <div v-if="!selected && !$store.getters.bannedHeroIds.includes(heroId)" class="banIcon" @click="onBan">BAN</div>
+    <div v-if="selected" class="banIcon" @click="onBan">{{ }}</div>
+    <div v-if="!selected && !banned" class="banIcon" @click="onBan">BAN</div>
   </div>
 </template>
 
@@ -42,21 +43,27 @@ export default class Hero extends Vue {
     }
   }
 
+  get banned() {
+    return this.$store.getters.bannedHeroIds.includes(this.heroId)
+  }
+
   private onBan(event: Event) {
     event.stopPropagation()
     this.$store.dispatch('updateBanned', this.heroId)
   }
 
-  get team() {
-    const player = this.$store.getters.players.find((player: Player) => {
+  get player() {
+   return this.$store.getters.players.find((player: Player) => {
       return player.selectedId === this.heroId
     })
-    return player ? Team[player.team] : null
+  }
+
+  get Team() {
+    return Team
   }
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="css">
 .banIcon {
   padding: 2px 4px;
