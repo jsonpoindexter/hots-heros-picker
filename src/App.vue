@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <h1>HoTS Draft Picker</h1>
+    <h1 style="user-select: none;">HoTS Draft Picker</h1>
     <ControlPanel></ControlPanel>
     <TeamPanel />
     <div class="heros">

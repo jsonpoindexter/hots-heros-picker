@@ -1,5 +1,5 @@
 <template>
-  <label>
+  <label style="user-select: none;">
     <h4>UserName</h4>
     <input v-model.lazy="username" name="username" type="text" />
   </label>

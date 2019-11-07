@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="user-select: none;">
     <h4>Choose Team</h4>
     <div>
       <button style="background: red" @click="selectTeam(Team.red)"></button>

@@ -43,9 +43,10 @@ export default class Players extends Vue {
 <style scoped>
 table {
   min-width: 700px;
-  pointer-events: none;
+  user-select: none;
 }
 td {
+  pointer-events: none;
   padding: 3px 8px ;
   text-align: left;
   font-size: 26px;
