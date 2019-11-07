@@ -72,16 +72,19 @@ export default new Vuex.Store<RootState>({
 
     // Select / Deselect heros
     updateSelected({ getters: { bannedHeroIds }, commit, state: { heros, user, players } }, heroId: number) {
-      // Check if User is trying to select a hero thas has been selected by another player
-      const otherPlayerHeros = players.map((player: Player) => player.selectedId)
-      if (otherPlayerHeros.includes(heroId)) return
-      bannedHeroIds.includes(heroId) ? commit('banHero', heroId) : commit('selectHero', heroId)
+      // Check if User is trying to select a hero that has been selected by another player
+      if (players.map((player: Player) => player.selectedId).includes(heroId)) return
+      // Check if User is trying to ban a hero that has been selected by another player
+      if (players.flatMap((player: Player) => player.bannedIds).includes(heroId)) return
+      user.bannedIds.includes(heroId) ? commit('banHero', heroId) : commit('selectHero', heroId)
 
       const url = `/hero/select/${heros[heroId].urlName}/`
       user.selectedId ? instance.post(url) : instance.delete(url)
     },
     // Ban / UnBan heros
-    updateBanned({ commit, state: { heros } }, heroId: number) {
+    updateBanned({ commit, state: { heros, players }, getters: { bannedHeroIds } }, heroId: number) {
+      console.log('foo: ', players.flatMap((player: Player) => player.bannedIds).includes(heroId))
+      if (players.flatMap((player: Player) => player.bannedIds).includes(heroId)) return
       commit('banHero', heroId)
       const hero = heros[heroId]
       const url = `/hero/ban/${hero.urlName}/`

@@ -18,9 +18,11 @@
           />
         </a>
       </div>
-      <h5 class="HeroName-text">{{ selected ? player.name : name }}</h5>
-      <div v-show="disabled" class="image-overlay"></div>
-      <div v-show="$store.getters.bannedHeroIds.includes(heroId)" class="image-overlay">
+      <h5 class="HeroName-text"> {{ name }} </h5>
+      <div v-show="disabled" class="disable-overlay"></div>
+      <div v-show="selected && player" class="selected-overlay">{{ player ? player.name  : null}}</div>
+      <div v-show="$store.getters.bannedHeroIds.includes(heroId)" class="disable-overlay">
+        <span style="color: lightgray">{{ player ? player.name  : null}}</span>
         <span class="banned-text">BANNED</span>
       </div>
       <div v-if="!selected && !banned" class="banIcon" @click="onBan">BAN</div>
@@ -56,7 +58,7 @@ export default class Hero extends Vue {
 
   get player() {
     return this.$store.getters.players.find((player: Player) => {
-      return player.selectedId === this.heroId
+      return player.selectedId === this.heroId || player.bannedIds.includes(this.heroId)
     })
   }
 
@@ -97,7 +99,7 @@ export default class Hero extends Vue {
 .disabled {
   pointer-events: none;
 }
-.image-overlay {
+.disable-overlay {
   width: 100%;
   height: 100%;
   top: 0;
@@ -105,6 +107,17 @@ export default class Hero extends Vue {
   position: absolute;
   padding: 0;
   background-color: rgba(0, 0, 0, 0.5);
+    color: lightgray;
+}
+.selected-overlay {
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  position: absolute;
+  padding: 0;
+  background-color: rgba(0, 0, 0, 0.1);
+  color: lightgray;
 }
 .selected {
   background-color: rgba(0,0,0,.5);
@@ -116,7 +129,7 @@ export default class Hero extends Vue {
   position: relative;
   width: 105px;
   -webkit-transition-duration: 0.2s;
-  /* transition-duration: 0.2s; */
+   transition-duration: 0.2s;
 }
 .HeroItem-container.inactive {
   opacity: 0.4;
