@@ -20,6 +20,8 @@
     </div>
     <h5 class="HeroName-text ">{{ name }}</h5>
     <div v-show="disabled" class="image-overlay"></div>
+    <div v-show="$store.getters.bannedHeroIds.includes(heroId)" class="image-overlay"><span class="banned-text">BANNED</span></div>
+    <div v-if="!selected && !$store.getters.bannedHeroIds.includes(heroId)" class="banIcon" @click="onBan">BAN</div>
   </div>
 </template>
 
@@ -39,6 +41,12 @@ export default class Hero extends Vue {
       this.$store.dispatch('updateSelected', this.heroId)
     }
   }
+
+  private onBan(event: Event) {
+    event.stopPropagation()
+    this.$store.dispatch('updateBanned', this.heroId)
+  }
+
   get team() {
     const player = this.$store.getters.players.find((player: Player) => {
       return player.selectedId === this.heroId
@@ -50,12 +58,39 @@ export default class Hero extends Vue {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="css">
+.banIcon {
+  padding: 2px 4px;
+  right: 0;
+  top: 0;
+  position: absolute;
+  border: 1px solid gray;
+  z-index: 99;
+}
+.banIcon:hover {
+  color: white;
+  background: #2c3e50;
+}
+
+.HeroItem-container .banIcon {
+   visibility: hidden;
+ }
+.HeroItem-container:hover .banIcon {
+  visibility: visible;
+}
+.banned-text {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  color: white;
+}
 .disabled {
   pointer-events: none;
 }
 .image-overlay {
-    width: 100%;
-    height: 100%;
+  width: 100%;
+  height: 100%;
   top: 0;
   left: 0;
   position: absolute;
@@ -66,6 +101,7 @@ export default class Hero extends Vue {
   background-color: rgba(0,0,0,.5);
 }
 .HeroItem-container {
+  margin: 10px;
   user-select: none;
   text-align: center;
   position: relative;

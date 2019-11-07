@@ -9,18 +9,18 @@
       <tr></tr>
       <tr v-for="(_, index) in 10" style="color: white;">
         <!-- Allow for 10 players to be on a team, but only show empty up to 5  -->
-        <td v-if="index <= 4 || (redPlayers[index] && index > 4)" style="background: red">
+        <td v-if="index <= 4 || ($store.getters.redPlayers[index] && index > 4)" style="background: red">
           {{
-            redPlayers[index]
-              ? displayName(redPlayers[index])
+            $store.getters.redPlayers[index]
+              ? displayName($store.getters.redPlayers[index])
               : 'empty'
           }}
         </td>
         <td v-else></td>
-        <td v-if="index <= 4 || (bluePlayers[index] && index > 4)" style="background: blue">
+        <td v-if="index <= 4 || ($store.getters.bluePlayers[index] && index > 4)" style="background: blue">
           {{
-            bluePlayers[index]
-              ? displayName(bluePlayers[index])
+            $store.getters.bluePlayers[index]
+              ? displayName($store.getters.bluePlayers[index])
               : 'empty'
           }}
         </td>
@@ -37,20 +37,6 @@ import { Player, Team } from '@/store/types'
 export default class Players extends Vue {
   displayName(player: Player) {
     return player.name + (player.selectedId !== null ? (' - ' + this.$store.state.heros[player.selectedId].name) : '')
-  }
-
-  get players() {
-    return [this.$store.state.user, ...this.$store.state.players]
-  }
-  get redPlayers() {
-    return this.players.filter((player: Player) => {
-      return player.team === Team.red
-    })
-  }
-  get bluePlayers() {
-    return this.players.filter((player: Player) => {
-      return player.team === Team.blue
-    })
   }
 }
 </script>

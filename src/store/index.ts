@@ -26,12 +26,24 @@ export default new Vuex.Store<RootState>({
     // Draft session
     session: '',
     heros: JSON.parse(JSON.stringify(defaultHeros)),
-    user: { name: 'muffinsticks', team: Team.red, selectedId: 0 },
-    players: [{ name: 'foo', team: Team.blue, selectedId: 1 }, { name: 'boo', team: Team.blue, selectedId: 2 }, { name: 'woo', team: Team.red, selectedId: 3 }, { name: 'boo', team: Team.blue, selectedId: 4 }, { name: 'boo', team: Team.blue, selectedId: 5 }, { name: 'boo', team: Team.blue, selectedId: 6 }, { name: 'boo', team: Team.blue, selectedId: 7 }],
+    user: { name: 'muffinsticks', team: Team.red, selectedId: 0, bannedIds: [] },
+    players: [
+      { name: 'flippy', team: Team.blue, selectedId: 1, bannedIds: [] },
+      { name: 'NoG0D', team: Team.blue, selectedId: 24, bannedIds: [] },
+      { name: 'terminator', team: Team.red, selectedId: 15, bannedIds: [] },
+      { name: 'spudly42', team: Team.blue, selectedId: 4, bannedIds: [] },
+      { name: 'rgam42', team: Team.blue, selectedId: 8, bannedIds: [] },
+      { name: 'pattykakes42', team: Team.blue, selectedId: 45, bannedIds: [] },
+      { name: 'loser', team: Team.blue, selectedId: 29, bannedIds: [] },
+    ],
   },
   mutations: {
-    selectHero({ user, heros }, heroId: number) {
+    selectHero({ user }, heroId: number) {
       user.selectedId = user.selectedId === heroId ? null : heroId
+    },
+    banHero({user: { bannedIds }}, heroId: number) {
+      const index = bannedIds.findIndex((id: number) => id === heroId)
+      index >= 0 ? bannedIds.splice(index, 1) : bannedIds.push(heroId)
     },
     team({ user }, team: Team) {
       if (user) user.team = team
@@ -45,6 +57,7 @@ export default new Vuex.Store<RootState>({
         user.selectedId = null
       }
     },
+
     username({ user }, username: string) {
       if (user) user.name = username
     },
@@ -58,18 +71,21 @@ export default new Vuex.Store<RootState>({
     },
 
     // Select / Deselect heros
-    updateSelected({ getters, commit, state: { heros, user, players } }, heroId: number) {
+    updateSelected({ getters: { bannedHeroIds}, commit, state: { heros, user, players } }, heroId: number) {
       // Check if User is trying to select a hero thas has been selected by another player
       const otherPlayerHeros = players.map((player: Player) => player.selectedId)
       if (otherPlayerHeros.includes(heroId)) return
-      commit('selectHero', heroId)
+      bannedHeroIds.includes(heroId) ? commit('banHero', heroId) : commit('selectHero', heroId)
+
       const url = `/hero/select/${heros[heroId].urlName}/`
       user.selectedId ? instance.post(url) : instance.delete(url)
     },
     // Ban / UnBan heros
-    updateBanned(context: any, payload: Payload) {
-      const url = `/hero/ban/${payload.urlName}/`
-      payload.value ? instance.post(url) : instance.delete(url)
+    updateBanned({ commit, state: { heros } }, heroId: number) {
+      commit('banHero', heroId)
+      const hero = heros[heroId]
+      const url = `/hero/ban/${hero.urlName}/`
+      heroId ? instance.post(url) : instance.delete(url)
     },
     // Delete current draft session
     resetSession(context: any) {
@@ -92,15 +108,20 @@ export default new Vuex.Store<RootState>({
     players({ user, players }) {
       return [user, ...players]
     },
-    // redPlayers() {
-    //   return players.filter((player: Player) => {
-    //     return player.team === Team.red
-    //   })
-    // },
-    // bluePlayers() {
-    //   return players.filter((player: Player) => {
-    //     return player.team === Team.blue
-    //   })
-    // },
+    bannedHeroIds(state, getters) {
+      return getters.players.flatMap((player: Player) => {
+        return player.bannedIds
+      })
+    },
+    redPlayers(state, getters) {
+      return getters.players.filter((player: Player) => {
+        return player.team === Team.red
+      })
+    },
+    bluePlayers(state, getters) {
+      return getters.players.filter((player: Player) => {
+        return player.team === Team.blue
+      })
+    },
   },
 })
