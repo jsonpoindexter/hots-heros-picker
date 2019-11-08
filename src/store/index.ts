@@ -1,3 +1,4 @@
+import {client} from '@/client'
 import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios'
@@ -6,13 +7,9 @@ import { defaultHeros } from '@/variables'
 
 Vue.use(Vuex)
 
-const instance = axios.create({
-  baseURL: 'http://localhost:3000/api/v1',
-  timeout: 1000,
-})
 
 interface RootState {
-  session: string
+  sessionId: string
   heros: Hero[]
   user: Player
   players: Player[]
@@ -24,7 +21,7 @@ interface RootState {
 export default new Vuex.Store<RootState>({
   state: {
     // Draft session
-    session: '',
+    sessionId: '',
     heros: JSON.parse(JSON.stringify(defaultHeros)),
     user: { name: 'muffinsticks', team: Team.red, selectedId: 0, bannedIds: [2, 3] },
     players: [
@@ -38,6 +35,9 @@ export default new Vuex.Store<RootState>({
     ],
   },
   mutations: {
+    sessionId(store, sessionId: string) {
+      store.sessionId = sessionId
+    },
     selectHero({ user }, heroId: number) {
       user.selectedId = user.selectedId === heroId ? null : heroId
     },
@@ -67,7 +67,7 @@ export default new Vuex.Store<RootState>({
     updateTeam(context: any, team: Team) {
       // context.commit('resetUserSelected')
       context.commit('team', team)
-      instance.post(`/player/team/${Team[team]}`)
+      client.post(`/player/team/${Team[team]}`)
     },
 
     // Select / Deselect heros
@@ -79,27 +79,26 @@ export default new Vuex.Store<RootState>({
       user.bannedIds.includes(heroId) ? commit('banHero', heroId) : commit('selectHero', heroId)
 
       const url = `/hero/select/${heros[heroId].urlName}/`
-      user.selectedId ? instance.post(url) : instance.delete(url)
+      user.selectedId ? client.post(url) : client.delete(url)
     },
     // Ban / UnBan heros
     updateBanned({ commit, state: { heros, players }, getters: { bannedHeroIds } }, heroId: number) {
-      console.log('foo: ', players.flatMap((player: Player) => player.bannedIds).includes(heroId))
       if (players.flatMap((player: Player) => player.bannedIds).includes(heroId)) return
       commit('banHero', heroId)
       const hero = heros[heroId]
       const url = `/hero/ban/${hero.urlName}/`
-      heroId ? instance.post(url) : instance.delete(url)
+      heroId ? client.post(url) : client.delete(url)
     },
     // Delete current draft session
     resetSession(context: any) {
       context.commit('resetHeros')
       // TODO: handle refresh and update session when deleted
-      instance.delete('/')
+      client.delete('/')
     },
     // TODO: handle if username already exists
     updateUsername(context, username: string) {
       context.commit('username', username)
-      instance.post(`/user/${username}`)
+      client.post(`/user/${username}`)
     },
   },
   modules: {},
