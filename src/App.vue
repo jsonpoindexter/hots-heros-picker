@@ -22,7 +22,8 @@ import { Component, Vue } from 'vue-property-decorator'
 import Hero from '@/components/Hero.vue'
 import TeamPanel from '@/components/Team/index.vue'
 import ControlPanel from '@/components/ControlPanel.vue'
-import {Player, Team} from "@/store/types";
+import { Player, Team } from '@/store/types'
+import { Socket } from 'vue-socket.io-extended'
 @Component({
   components: {
     ControlPanel,
@@ -31,6 +32,7 @@ import {Player, Team} from "@/store/types";
   },
 })
 export default class App extends Vue {
+  @Socket()
   get heros() {
     return this.$store.state.heros
   }
