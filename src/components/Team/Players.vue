@@ -10,19 +10,11 @@
       <tr v-for="(_, index) in 10" style="color: white;">
         <!-- Allow for 10 players to be on a team, but only show empty up to 5  -->
         <td v-if="index <= 4 || ($store.getters.redPlayers[index] && index > 4)" style="background: red">
-          {{
-            $store.getters.redPlayers[index]
-              ? displayName($store.getters.redPlayers[index])
-              : 'empty'
-          }}
+          {{ $store.getters.redPlayers[index] ? displayName($store.getters.redPlayers[index]) : 'empty' }}
         </td>
         <td v-else></td>
         <td v-if="index <= 4 || ($store.getters.bluePlayers[index] && index > 4)" style="background: blue">
-          {{
-            $store.getters.bluePlayers[index]
-              ? displayName($store.getters.bluePlayers[index])
-              : 'empty'
-          }}
+          {{ $store.getters.bluePlayers[index] ? displayName($store.getters.bluePlayers[index]) : 'empty' }}
         </td>
         <td v-else></td>
       </tr>
@@ -35,8 +27,8 @@ import { Player, Team } from '@/store/types'
 
 @Component({})
 export default class Players extends Vue {
-  displayName(player: Player) {
-    return player.name + (player.selectedId !== null ? (' - ' + this.$store.state.heros[player.selectedId].name) : '')
+  private displayName(player: Player) {
+    return player.name + (player.selectedId !== null ? ' - ' + this.$store.state.heros[player.selectedId].name : '')
   }
 }
 </script>
@@ -47,7 +39,7 @@ table {
 }
 td {
   pointer-events: none;
-  padding: 3px 8px ;
+  padding: 3px 8px;
   text-align: left;
   font-size: 26px;
   width: 50%;

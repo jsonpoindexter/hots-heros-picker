@@ -18,11 +18,11 @@
           />
         </a>
       </div>
-      <h5 class="HeroName-text"> {{ name }} </h5>
+      <h5 class="HeroName-text">{{ name }}</h5>
       <div v-show="disabled" class="disable-overlay"></div>
-      <div v-show="selected && player" class="selected-overlay">{{ player ? player.name  : null}}</div>
+      <div v-show="selected && player" class="selected-overlay">{{ player ? player.name : null }}</div>
       <div v-show="$store.getters.bannedHeroIds.includes(heroId)" class="disable-overlay">
-        <span style="color: lightgray">{{ player ? player.name  : null}}</span>
+        <span style="color: lightgray">{{ player ? player.name : null }}</span>
         <span class="banned-text">BANNED</span>
       </div>
       <div v-if="!selected && !banned" class="banIcon" @click="onBan">BAN</div>

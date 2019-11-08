@@ -7,9 +7,9 @@
     </thead>
     <tbody>
       <tr></tr>
-        <tr v-for="id in $store.getters.bannedHeroIds">
-            <td>{{ $store.state.heros[id].name }}</td>
-        </tr>
+      <tr v-for="id in $store.getters.bannedHeroIds">
+        <td>{{ $store.state.heros[id].name }}</td>
+      </tr>
     </tbody>
   </table>
 </template>
