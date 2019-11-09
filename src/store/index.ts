@@ -1,12 +1,11 @@
-import {client} from '@/client'
+import { client } from '@/client'
 import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios'
-import { Hero, Payload, Player, Team } from '@/store/types'
+import { Hero, Player, Team } from '@/store/types'
 import { defaultHeros } from '@/variables'
 
 Vue.use(Vuex)
-
 
 interface RootState {
   sessionId: string
@@ -23,16 +22,8 @@ export default new Vuex.Store<RootState>({
     // Draft session
     sessionId: '',
     heros: JSON.parse(JSON.stringify(defaultHeros)),
-    user: { name: 'muffinsticks', team: Team.red, selectedId: 0, bannedIds: [2, 3] },
-    players: [
-      { name: 'flippy', team: Team.blue, selectedId: 1, bannedIds: [9] },
-      { name: 'NoG0D', team: Team.blue, selectedId: 24, bannedIds: [] },
-      { name: 'terminator', team: Team.red, selectedId: 15, bannedIds: [10] },
-      { name: 'spudly42', team: Team.blue, selectedId: 4, bannedIds: [] },
-      { name: 'rgam42', team: Team.blue, selectedId: 8, bannedIds: [23] },
-      { name: 'pattykakes42', team: Team.blue, selectedId: 45, bannedIds: [] },
-      { name: 'loser', team: Team.blue, selectedId: 29, bannedIds: [] },
-    ],
+    user: { name: localStorage.getItem('username') || '', team: null, selectedId: null, bannedIds: [] },
+    players: [],
   },
   mutations: {
     sessionId(store, sessionId: string) {
@@ -59,6 +50,7 @@ export default new Vuex.Store<RootState>({
     },
 
     username({ user }, username: string) {
+      localStorage.setItem('username', username)
       if (user) user.name = username
     },
   },

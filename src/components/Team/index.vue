@@ -21,6 +21,7 @@ export default class TeamPanel extends Vue {}
 .wrapper {
   display: flex;
   justify-content: space-evenly;
+  flex-wrap: wrap;
 }
 button {
   height: 100px;
