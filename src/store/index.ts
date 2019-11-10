@@ -60,6 +60,9 @@ export default new Vuex.Store<RootState>({
         user.selectedId = null
       }
     },
+    addPlayer({players}, player) {
+      players.push(player)
+    }
   },
   actions: {
     // Select team color
@@ -77,7 +80,7 @@ export default new Vuex.Store<RootState>({
       if (players.flatMap((player: Player) => player.bannedIds).includes(heroId)) return
       user.bannedIds.includes(heroId) ? commit('banHero', heroId) : commit('selectHero', heroId)
 
-      const url = `/hero/select/${heros[heroId].urlName}/`
+      // const url = `/hero/select/${heros[heroId].urlName}/`
       // user.selectedId ? client.post(url) : client.delete(url)
     },
     // Ban / UnBan heros

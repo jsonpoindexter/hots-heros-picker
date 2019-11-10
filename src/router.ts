@@ -1,5 +1,6 @@
 import App from '@/App.vue'
 import { client } from '@/client'
+import { Player } from '@/store/types'
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import store from './store'
@@ -33,7 +34,10 @@ const routes = [
         const session = (await client.get(`/${to.params.sessionId}`)).data
         // tslint:disable-next-line:no-console
         console.log(`retrieved session: `, session)
-      }catch(err) {
+        session.players.forEach((player: Player) => {
+          if (player.name !== store.state.user.name) store.commit('addPlayer', player)
+        })
+      } catch (err) {
         // tslint:disable-next-line:no-console
         console.log(err)
       }

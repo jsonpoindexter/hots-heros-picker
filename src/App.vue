@@ -36,8 +36,9 @@ import VueSocketIOExt, { Socket } from 'vue-socket.io-extended'
 })
 export default class App extends Vue {
   created() {
-    this.$socket.$subscribe('sessionInit', (payload: any) => {
-      console.log(payload)
+    this.$socket.$subscribe('addPlayer', (player: { name: string; team: string }) => {
+      console.log('addPlayer ', player)
+      this.$store.commit('addPlayer', player)
     })
   }
   get heros() {
