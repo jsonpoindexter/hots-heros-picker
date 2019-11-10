@@ -1,7 +1,8 @@
+import { Hero, Player, SelectPayload, Team } from '@/store/types'
+import { defaultHeros } from '@/variables'
+import uuid from 'uuid/v4'
 import Vue from 'vue'
 import Vuex from 'vuex'
-import { Hero, Player, Team } from '@/store/types'
-import { defaultHeros } from '@/variables'
 
 Vue.use(Vuex)
 
@@ -34,7 +35,6 @@ export default new Vuex.Store<RootState>({
         this._vm.$socket.client.emit('addPlayer', { sessionId, name: user.name, team: user.team })
       }
       localStorage.setItem('username', username)
-
     },
     team({ user, sessionId }, team: Team) {
       if (user) user.team = team

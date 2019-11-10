@@ -7,11 +7,11 @@
   </div>
 </template>
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import Banned from '@/components/Team/Banned.vue'
+import Players from '@/components/Team/Players.vue'
 import SelectTeam from '@/components/Team/SelectTeam.vue'
 import UsernameInput from '@/components/Team/UsernameInput.vue'
-import Players from '@/components/Team/Players.vue'
-import Banned from '@/components/Team/Banned.vue'
+import { Component, Vue } from 'vue-property-decorator'
 @Component({
   components: { Banned, UsernameInput, SelectTeam, Players },
 })

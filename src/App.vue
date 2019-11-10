@@ -21,11 +21,11 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import ControlPanel from '@/components/ControlPanel.vue'
 import Hero from '@/components/Hero.vue'
 import TeamPanel from '@/components/Team/index.vue'
-import ControlPanel from '@/components/ControlPanel.vue'
 import { Player } from '@/store/types'
+import { Component, Vue } from 'vue-property-decorator'
 import VueSocketIOExt, { Socket } from 'vue-socket.io-extended'
 @Component({
   components: {

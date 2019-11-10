@@ -9,8 +9,8 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
 import { Team } from '@/store/types'
+import { Component, Vue } from 'vue-property-decorator'
 @Component({})
 export default class SelectTeam extends Vue {
   private selectTeam(team: Team) {

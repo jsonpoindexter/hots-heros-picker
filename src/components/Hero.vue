@@ -31,8 +31,8 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator'
 import { Player, Team } from '@/store/types'
+import { Component, Prop, Vue } from 'vue-property-decorator'
 
 @Component
 export default class Hero extends Vue {
@@ -43,7 +43,7 @@ export default class Hero extends Vue {
   @Prop() private heroId!: number
   private onSelect() {
     if (!this.disabled) {
-      this.$store.dispatch('updateSelected', this.heroId)
+      this.$store.dispatch('updateSelected', {name: this.$store.state.username, heroId: this.heroId })
     }
   }
 

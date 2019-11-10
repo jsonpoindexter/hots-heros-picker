@@ -1,9 +1,9 @@
+import io from 'socket.io-client'
 import Vue from 'vue'
 import VueSocketIOExt from 'vue-socket.io-extended'
-import io from 'socket.io-client'
 import App from './App.vue'
-import store from './store'
 import router from './router'
+import store from './store'
 
 const socket = io(`:8081/`)
 Vue.use(VueSocketIOExt, socket, { store })

@@ -22,8 +22,8 @@
   </table>
 </template>
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
 import { Player, Team } from '@/store/types'
+import { Component, Vue } from 'vue-property-decorator'
 
 @Component({})
 export default class Players extends Vue {
