@@ -1,6 +1,7 @@
 import App from '@/App.vue'
 import { client } from '@/client'
 import { Player } from '@/store/types'
+import uuid from 'uuid/v4'
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import store from './store'
@@ -30,13 +31,18 @@ const routes = [
     path: '/:sessionId',
     component: App,
     beforeEnter: async (to: any, from: any, next: () => void) => {
+      if(!store.state.userId) store.commit('userId', uuid())
       try {
         const session = (await client.get(`/${to.params.sessionId}`)).data
         // tslint:disable-next-line:no-console
         console.log(`retrieved session: `, session)
         session.players.forEach((player: Player) => {
-          if (player.name !== store.state.user.name) store.commit('addPlayer', player)
+          store.commit('addPlayer', player)
         })
+        // We are the first user, add ourselves
+        if(!session.players.flatMap((player: Player) => player.id).includes(store.state.userId)) {
+          store.commit('addPlayer', {bannedIds: [], id: store.state.userId, name: localStorage.getItem('username') || '', selectedId: null, team: null})
+        }
       } catch (err) {
         // tslint:disable-next-line:no-console
         console.log(err)

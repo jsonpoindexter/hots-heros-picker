@@ -43,7 +43,7 @@ export default class Hero extends Vue {
   @Prop() private heroId!: number
   private onSelect() {
     if (!this.disabled) {
-      this.$store.dispatch('updateSelected', {name: this.$store.state.username, heroId: this.heroId })
+      this.$store.dispatch('updateSelected', {id: this.$store.getters.user.id, heroId: this.heroId })
     }
   }
 

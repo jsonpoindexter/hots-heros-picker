@@ -9,8 +9,14 @@ export enum Team {
 }
 
 export interface Player {
+  id: string
   name: string
   team: Team | null
   selectedId: number | null // Hero index
   bannedIds: number[]
+}
+
+export interface SelectPayload {
+  name: string
+  heroId: number
 }

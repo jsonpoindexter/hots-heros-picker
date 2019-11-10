@@ -8,8 +8,8 @@ Vue.use(Vuex)
 
 interface RootState {
   sessionId: string
+  userId: string
   heros: Hero[]
-  user: Player
   players: Player[]
 }
 
@@ -17,68 +17,85 @@ export default new Vuex.Store<RootState>({
   state: {
     // Draft session
     sessionId: '',
+    userId: localStorage.getItem('userId') || '',
     heros: JSON.parse(JSON.stringify(defaultHeros)),
-    user: { name: localStorage.getItem('username') || '', team: null, selectedId: null, bannedIds: [] },
     players: [],
   },
   mutations: {
+    userId(store, userId: string) {
+      store.userId = userId
+      localStorage.setItem('userId', userId)
+    },
     sessionId(store, sessionId: string) {
       store.sessionId = sessionId
       // Send event to join specific session
       // @ts-ignore
       this._vm.$socket.client.emit('session', sessionId)
     },
-    username({ user, sessionId }, username: string) {
-      user.name = username
+    username({ userId, players, sessionId }, payload: { id: string; username: string }) {
+      const user = players.find((player: Player) => player.id === payload.id)
+      if (!user) return
+      user.name = payload.username
       if (user.name && user.team !== null) {
+        // TODO: add User to players
         // @ts-ignore
-        this._vm.$socket.client.emit('addPlayer', { sessionId, name: user.name, team: user.team })
+        this._vm.$socket.client.emit('addPlayer', { sessionId, id: user.id, name: user.name, team: user.team })
       }
-      localStorage.setItem('username', username)
+      localStorage.setItem('username', payload.username)
     },
-    team({ user, sessionId }, team: Team) {
+    team({ userId, players, sessionId }, team: Team) {
+      const user = players.find((player: Player) => player.id === userId)
+      if (!user) return
       if (user) user.team = team
       if (user.name && user.team !== null) {
         // @ts-ignore
-        this._vm.$socket.client.emit('addPlayer', { sessionId, name: user.name, team: user.team })
+        this._vm.$socket.client.emit('addPlayer', { sessionId, id: user.id, name: user.name, team: user.team })
       }
     },
-    selectHero({ user }, heroId: number) {
+    selectHero({ userId, players }, heroId: number) {
+      const user = players.find((player: Player) => player.id === userId)
+      if (!user) return
       user.selectedId = user.selectedId === heroId ? null : heroId
     },
-    banHero({ user: { bannedIds } }, heroId: number) {
-      const index = bannedIds.findIndex((id: number) => id === heroId)
-      index >= 0 ? bannedIds.splice(index, 1) : bannedIds.push(heroId)
+    banHero({ userId, players }, heroId: number) {
+      const user = players.find((player: Player) => player.id === userId)
+      if (!user) return
+      const index = user.bannedIds.findIndex((id: number) => id === heroId)
+      index >= 0 ? user.bannedIds.splice(index, 1) : user.bannedIds.push(heroId)
     },
 
-    resetHeros({ user, heros }) {
+    resetHeros({ userId, players, heros }) {
+      const user = players.find((player: Player) => player.id === userId)
+      if (!user) return
       if (user) user.selectedId = null
       heros = JSON.parse(JSON.stringify(defaultHeros))
     },
-    resetUserSelected({ user, heros }) {
+    resetUserSelected({ userId, players, heros }) {
+      const user = players.find((player: Player) => player.id === userId)
+      if (!user) return
       if (user && user.selectedId) {
         user.selectedId = null
       }
     },
-    addPlayer({players}, player) {
+    addPlayer({ players }, player) {
       players.push(player)
-    }
+    },
   },
   actions: {
-    // Select team color
-    updateTeam(context: any, team: Team) {
-      // context.commit('resetUserSelected')
-      context.commit('team', team)
-      // client.post(`/player/team/${Team[team]}`)
+    updateUsername(context, payload: { id: string; username: string }) {
+      context.commit('username', payload)
     },
-
+    // Select team color
+    updateTeam(context, payload: { id: string; team: Team }) {
+      context.commit('team', payload)
+    },
     // Select / Deselect heros
-    updateSelected({ getters: { bannedHeroIds }, commit, state: { heros, user, players } }, heroId: number) {
+    updateSelected({ commit, state: { heros, players }, getters: { user } }, payload: SelectPayload) {
       // Check if User is trying to select a hero that has been selected by another player
-      if (players.map((player: Player) => player.selectedId).includes(heroId)) return
+      if (players.map((player: Player) => player.selectedId).includes(payload.heroId)) return
       // Check if User is trying to ban a hero that has been selected by another player
-      if (players.flatMap((player: Player) => player.bannedIds).includes(heroId)) return
-      user.bannedIds.includes(heroId) ? commit('banHero', heroId) : commit('selectHero', heroId)
+      if (players.flatMap((player: Player) => player.bannedIds).includes(payload.heroId)) return
+      user.bannedIds.includes(payload.heroId) ? commit('banHero', payload.heroId) : commit('selectHero', payload.heroId)
 
       // const url = `/hero/select/${heros[heroId].urlName}/`
       // user.selectedId ? client.post(url) : client.delete(url)
@@ -88,7 +105,7 @@ export default new Vuex.Store<RootState>({
       if (players.flatMap((player: Player) => player.bannedIds).includes(heroId)) return
       commit('banHero', heroId)
       const hero = heros[heroId]
-      const url = `/hero/ban/${hero.urlName}/`
+      // const url = `/hero/ban/${hero.urlName}/`
       // heroId ? client.post(url) : client.delete(url)
     },
     // Delete current draft session
@@ -97,20 +114,18 @@ export default new Vuex.Store<RootState>({
       // TODO: handle refresh and update session when deleted
       // client.delete('/')
     },
-    // TODO: handle if username already exists
-    updateUsername(context, username: string) {
-      context.commit('username', username)
-      // client.post(`/user/${username}`)
-    },
   },
   modules: {},
   getters: {
+    user({ userId, players }) {
+      return players.find((player: Player) => player.id === userId)
+    },
     // hero that the User has selcted
-    selectedHero({ user, heros }) {
+    selectedHero({ heros }, { user }) {
       return (user && user.selectedId && heros[user.selectedId]) || null
     },
-    players({ user, players }) {
-      return [user, ...players]
+    players({ players }) {
+      return players.filter((player: Player) => player.name)
     },
     bannedHeroIds(state, getters) {
       return getters.players.flatMap((player: Player) => {
@@ -127,8 +142,8 @@ export default new Vuex.Store<RootState>({
         return player.team === Team.blue
       })
     },
-    sessionId({sessionId}) {
+    sessionId({ sessionId }) {
       return sessionId
-    }
+    },
   },
 })

@@ -35,10 +35,14 @@ import VueSocketIOExt, { Socket } from 'vue-socket.io-extended'
   },
 })
 export default class App extends Vue {
-  created() {
-    this.$socket.$subscribe('addPlayer', (player: { name: string; team: string }) => {
+  public created() {
+    this.$socket.$subscribe('addPlayer', (player: { id: string, name: string; team: string }) => {
       console.log('addPlayer ', player)
       this.$store.commit('addPlayer', player)
+    })
+    this.$socket.$subscribe('heroSelect',(player: { id: string, selectedId: number }) => {
+      console.log('heroSelect ', this.$store.state.heros[player.selectedId].name)
+      this.$store.commit('updateSelected', player)
     })
   }
   get heros() {
@@ -50,7 +54,7 @@ export default class App extends Vue {
   }
 
   get hasUsername() {
-    return !!(this.$store.state.user ? this.$store.state.user.name : '')
+    return !!(this.$store.getters.user ? this.$store.getters.user.name : '')
   }
   // Has filled out username and picked a team
   get hasMinData() {
@@ -58,7 +62,7 @@ export default class App extends Vue {
   }
 
   get team() {
-    return this.$store.state.user.team !== null
+    return this.$store.getters.user.team !== null
   }
 }
 </script>
