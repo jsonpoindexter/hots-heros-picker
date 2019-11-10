@@ -26,7 +26,7 @@ import Hero from '@/components/Hero.vue'
 import TeamPanel from '@/components/Team/index.vue'
 import ControlPanel from '@/components/ControlPanel.vue'
 import { Player } from '@/store/types'
-import { Socket } from 'vue-socket.io-extended'
+import VueSocketIOExt, { Socket } from 'vue-socket.io-extended'
 @Component({
   components: {
     ControlPanel,
@@ -35,7 +35,11 @@ import { Socket } from 'vue-socket.io-extended'
   },
 })
 export default class App extends Vue {
-  @Socket()
+  created() {
+    this.$socket.$subscribe('sessionInit', (payload: any) => {
+      console.log(payload)
+    })
+  }
   get heros() {
     return this.$store.state.heros
   }
@@ -88,7 +92,7 @@ body {
   left: 0;
   position: absolute;
   padding: 0;
-  background-color: rgba(0, 0, 0, .9);
+  background-color: rgba(0, 0, 0, 0.9);
   color: lightgray;
 }
 .disable-overlay p {
