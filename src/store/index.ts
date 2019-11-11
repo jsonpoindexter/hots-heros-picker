@@ -30,7 +30,7 @@ export default new Vuex.Store<RootState>({
       store.sessionId = sessionId
       // Send event to join specific session
       // @ts-ignore
-      // this._vm.$socket.client.emit('session', sessionId)
+      this._vm.$socket.client.emit('session', sessionId)
     },
     playerName({ userId, players, sessionId }, payload: { id: string; name: string }) {
       const user = players.find((player: Player) => player.id === payload.id)
