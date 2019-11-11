@@ -51,6 +51,8 @@ export default class Hero extends Vue {
           .includes(this.heroId)
       )
         return
+      // Check if User is trying to ban/un-ban a hero that has been banned by another player
+      if (this.$store.getters.players.filter((player: Player) => player.id !== this.$store.state.userId).flatMap((player: Player) => player.bannedIds).includes(this.heroId)) return
       this.$store.dispatch('updateSelected', { id: this.$store.getters.user.id, heroId: this.heroId })
     }
   }
