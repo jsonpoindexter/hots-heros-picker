@@ -24,7 +24,7 @@
 import ControlPanel from '@/components/ControlPanel.vue'
 import Hero from '@/components/Hero.vue'
 import TeamPanel from '@/components/Team/index.vue'
-import {Player, Team} from "@/store/types"
+import { Player, Team } from '@/store/types'
 import { Component, Vue } from 'vue-property-decorator'
 import VueSocketIOExt, { Socket } from 'vue-socket.io-extended'
 @Component({
@@ -36,21 +36,21 @@ import VueSocketIOExt, { Socket } from 'vue-socket.io-extended'
 })
 export default class App extends Vue {
   public created() {
-    this.$socket.$subscribe('addPlayer', (player: { id: string, name: string; team: string }) => {
-      console.log('addPlayer ', player)
-      this.$store.commit('addPlayer', player)
+    this.$socket.$subscribe('addPlayer', (payload: { id: string; name: string; team: string }) => {
+      console.log('addPlayer ', payload)
+      this.$store.commit('addPlayer', payload)
     })
-    this.$socket.$subscribe('updatePlayerName', (player: { id: string, name: string }) => {
-      console.log('updatePlayerName ', player)
-      this.$store.dispatch('updatePlayerName', player)
+    this.$socket.$subscribe('updatePlayerName', (payload: { id: string; name: string }) => {
+      console.log('updatePlayerName ', payload)
+      this.$store.dispatch('updatePlayerName', payload)
     })
-    this.$socket.$subscribe('updatePlayerTeam', (player: { id: string, team: Team }) => {
-      console.log('updatePlayerTeam ', player)
-      this.$store.dispatch('updateTeam', player)
+    this.$socket.$subscribe('updatePlayerTeam', (payload: { id: string; team: Team }) => {
+      console.log('updatePlayerTeam ', payload)
+      this.$store.dispatch('updateTeam', payload)
     })
-    this.$socket.$subscribe('heroSelect',(player: { id: string, selectedId: number }) => {
-      console.log('heroSelect ', this.$store.state.heros[player.selectedId].name)
-      this.$store.commit('updateSelected', player)
+    this.$socket.$subscribe('updateSelectedHero', (payload: { id: string; heroId: number }) => {
+      console.log('updateSelectedHero ',payload)
+      this.$store.dispatch('updateSelected', payload)
     })
   }
   get heros() {

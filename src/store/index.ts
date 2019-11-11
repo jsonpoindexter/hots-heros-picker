@@ -22,15 +22,18 @@ export default new Vuex.Store<RootState>({
     players: [],
   },
   mutations: {
-    userId(store, userId: string) {
-      store.userId = userId
-      localStorage.setItem('userId', userId)
-    },
     sessionId(store, sessionId: string) {
       store.sessionId = sessionId
       // Send event to join specific session
       // @ts-ignore
       this._vm.$socket.client.emit('session', sessionId)
+    },
+    userId(store, userId: string) {
+      store.userId = userId
+      localStorage.setItem('userId', userId)
+    },
+    addPlayer({ players, userId, sessionId }, player) {
+      players.push(player)
     },
     playerName({ userId, players, sessionId }, payload: { id: string; name: string }) {
       const user = players.find((player: Player) => player.id === payload.id)
@@ -42,10 +45,11 @@ export default new Vuex.Store<RootState>({
       if (!user) return
       user.team = payload.team
     },
-    selectHero({ userId, players }, heroId: number) {
-      const user = players.find((player: Player) => player.id === userId)
+    selectHero({ userId, players }, payload: { id: string, heroId: number}) {
+      const user = players.find((player: Player) => player.id === payload.id)
       if (!user) return
-      user.selectedId = user.selectedId === heroId ? null : heroId
+      // Toggle selected
+      user.selectedId = user.selectedId === payload.heroId ? null : payload.heroId
     },
     banHero({ userId, players }, heroId: number) {
       const user = players.find((player: Player) => player.id === userId)
@@ -53,7 +57,6 @@ export default new Vuex.Store<RootState>({
       const index = user.bannedIds.findIndex((id: number) => id === heroId)
       index >= 0 ? user.bannedIds.splice(index, 1) : user.bannedIds.push(heroId)
     },
-
     resetHeros({ userId, players, heros }) {
       const user = players.find((player: Player) => player.id === userId)
       if (!user) return
@@ -67,11 +70,9 @@ export default new Vuex.Store<RootState>({
         user.selectedId = null
       }
     },
-    addPlayer({ players, userId, sessionId }, player) {
-      players.push(player)
-    },
   },
   actions: {
+    // Add current players (and self) when connecting to a new session
     initPlayers({ commit, state: { players, userId, sessionId } }, playersPayload: Player[]) {
       // A. no current players in session: add ourselves to players and emit socket event
       // B. current players in session
@@ -112,7 +113,7 @@ export default new Vuex.Store<RootState>({
       commit('playerName', payload)
       if (payload.id === user.id) {
         // @ts-ignore
-        this._vm.$socket.client.emit('updatePlayerName', { sessionId, id: user.id, name: user.name })
+        this._vm.$socket.client.emit('updatePlayerName', { sessionId, id: payload.id, name: payload.name })
         localStorage.setItem('username', payload.name)
       }
     },
@@ -121,27 +122,22 @@ export default new Vuex.Store<RootState>({
       commit('team', payload)
       if (payload.id === user.id) {
         // @ts-ignore
-        this._vm.$socket.client.emit('updatePlayerTeam', { sessionId, id: user.id, team: user.team })
+        this._vm.$socket.client.emit('updatePlayerTeam', { sessionId, id: payload.id, team: payload.team })
       }
     },
     // Select / Deselect heros
-    updateSelected({ commit, state: { heros, players }, getters: { user } }, payload: SelectPayload) {
-      // Check if User is trying to select a hero that has been selected by another player
-      if (players.map((player: Player) => player.selectedId).includes(payload.heroId)) return
-      // Check if User is trying to ban a hero that has been selected by another player
-      if (players.flatMap((player: Player) => player.bannedIds).includes(payload.heroId)) return
-      user.bannedIds.includes(payload.heroId) ? commit('banHero', payload.heroId) : commit('selectHero', payload.heroId)
+    updateSelected({ commit, state: { sessionId, heros, players, userId }, getters: { user } }, payload: SelectPayload) {
+      commit('selectHero', payload)
+      if (payload.id === user.id) {
+        // @ts-ignore
+        this._vm.$socket.client.emit('updateSelectedHero', { sessionId, id: payload.id, heroId: payload.heroId })
+      }
 
-      // const url = `/hero/select/${heros[heroId].urlName}/`
-      // user.selectedId ? client.post(url) : client.delete(url)
     },
     // Ban / UnBan heros
     updateBanned({ commit, state: { heros, players }, getters: { bannedHeroIds } }, heroId: number) {
       if (players.flatMap((player: Player) => player.bannedIds).includes(heroId)) return
       commit('banHero', heroId)
-      const hero = heros[heroId]
-      // const url = `/hero/ban/${hero.urlName}/`
-      // heroId ? client.post(url) : client.delete(url)
     },
     // Delete current draft session
     resetSession(context: any) {

@@ -22,6 +22,6 @@ export interface PlayerNamePayload {
 }
 
 export interface SelectPayload {
-  name: string
+  id: string
   heroId: number
 }

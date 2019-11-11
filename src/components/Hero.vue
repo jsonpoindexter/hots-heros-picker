@@ -43,6 +43,8 @@ export default class Hero extends Vue {
   @Prop() private heroId!: number
   private onSelect() {
     if (!this.disabled) {
+      // Check if User is trying to select a hero that has been selected by another player
+      if (this.$store.getters.players.filter((player: Player) => player.id !== this.$store.state.userId ).map((player: Player) => player.selectedId).includes(this.heroId)) return
       this.$store.dispatch('updateSelected', {id: this.$store.getters.user.id, heroId: this.heroId })
     }
   }
@@ -57,7 +59,7 @@ export default class Hero extends Vue {
   }
 
   get player() {
-    return this.$store.getters.players.find((player: Player) => {
+    return this.$store.state.players.find((player: Player) => {
       return player.selectedId === this.heroId || player.bannedIds.includes(this.heroId)
     })
   }
