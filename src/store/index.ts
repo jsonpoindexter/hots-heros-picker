@@ -45,17 +45,17 @@ export default new Vuex.Store<RootState>({
       if (!user) return
       user.team = payload.team
     },
-    selectHero({ userId, players }, payload: { id: string, heroId: number}) {
+    selectHero({ userId, players }, payload: { id: string; heroId: number }) {
       const user = players.find((player: Player) => player.id === payload.id)
       if (!user) return
       // Toggle selected
       user.selectedId = user.selectedId === payload.heroId ? null : payload.heroId
     },
-    banHero({ userId, players }, heroId: number) {
-      const user = players.find((player: Player) => player.id === userId)
+    banHero({ userId, players }, payload: { id: string; heroId: number }) {
+      const user = players.find((player: Player) => player.id === payload.id)
       if (!user) return
-      const index = user.bannedIds.findIndex((id: number) => id === heroId)
-      index >= 0 ? user.bannedIds.splice(index, 1) : user.bannedIds.push(heroId)
+      const index = user.bannedIds.findIndex((id: number) => id === payload.heroId)
+      index >= 0 ? user.bannedIds.splice(index, 1) : user.bannedIds.push(payload.heroId)
     },
     resetHeros({ userId, players, heros }) {
       const user = players.find((player: Player) => player.id === userId)
@@ -118,7 +118,7 @@ export default new Vuex.Store<RootState>({
       }
     },
     // Select team color
-    updateTeam({ commit, state: {sessionId},  getters: { user } }, payload: { id: string; team: Team }) {
+    updateTeam({ commit, state: { sessionId }, getters: { user } }, payload: { id: string; team: Team }) {
       commit('team', payload)
       if (payload.id === user.id) {
         // @ts-ignore
@@ -126,18 +126,26 @@ export default new Vuex.Store<RootState>({
       }
     },
     // Select / Deselect heros
-    updateSelected({ commit, state: { sessionId, heros, players, userId }, getters: { user } }, payload: SelectPayload) {
-      commit('selectHero', payload)
-      if (payload.id === user.id) {
-        // @ts-ignore
-        this._vm.$socket.client.emit('updateSelectedHero', { sessionId, id: payload.id, heroId: payload.heroId })
+    updateSelected(
+      { commit, dispatch, state: { sessionId, heros, players, userId }, getters: { user } },
+      payload: SelectPayload,
+    ) {
+      if (user.bannedIds.includes(payload.heroId)) dispatch('updateBanned', payload)
+      else {
+        commit('selectHero', payload)
+        if (payload.id === userId) {
+          // @ts-ignore
+          this._vm.$socket.client.emit('updateSelectedHero', { sessionId, id: payload.id, heroId: payload.heroId })
+        }
       }
-
     },
     // Ban / UnBan heros
-    updateBanned({ commit, state: { heros, players }, getters: { bannedHeroIds } }, heroId: number) {
-      if (players.flatMap((player: Player) => player.bannedIds).includes(heroId)) return
-      commit('banHero', heroId)
+    updateBanned({ commit, state: { heros, players, sessionId, userId } }, payload: SelectPayload) {
+      commit('banHero', payload)
+      if (payload.id === userId) {
+        // @ts-ignore
+        this._vm.$socket.client.emit('updateBannedHero', { sessionId, id: payload.id, heroId: payload.heroId })
+      }
     },
     // Delete current draft session
     resetSession(context: any) {
