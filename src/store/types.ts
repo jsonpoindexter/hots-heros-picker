@@ -16,6 +16,11 @@ export interface Player {
   bannedIds: number[]
 }
 
+export interface PlayerNamePayload {
+  id: string
+  name: string
+}
+
 export interface SelectPayload {
   name: string
   heroId: number

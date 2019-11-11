@@ -31,23 +31,16 @@ const routes = [
     path: '/:sessionId',
     component: App,
     beforeEnter: async (to: any, from: any, next: () => void) => {
-      if(!store.state.userId) store.commit('userId', uuid())
+      store.commit('sessionId', to.params.sessionId)
+      if (!store.state.userId) store.commit('userId', uuid())
       try {
         const session = (await client.get(`/${to.params.sessionId}`)).data
-        // tslint:disable-next-line:no-console
-        console.log(`retrieved session: `, session)
-        session.players.forEach((player: Player) => {
-          store.commit('addPlayer', player)
-        })
-        // We are the first user, add ourselves
-        if(!session.players.flatMap((player: Player) => player.id).includes(store.state.userId)) {
-          store.commit('addPlayer', {bannedIds: [], id: store.state.userId, name: localStorage.getItem('username') || '', selectedId: null, team: null})
-        }
+        console.log('session: ', session)
+        await store.dispatch('initPlayers', session.players)
       } catch (err) {
         // tslint:disable-next-line:no-console
         console.log(err)
       }
-      store.commit('sessionId', to.params.sessionId)
       next()
     },
   },

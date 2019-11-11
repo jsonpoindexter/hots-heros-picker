@@ -12,7 +12,7 @@ export default class UsernameInput extends Vue {
   private username: string = localStorage.getItem('username') || ''
   @Watch('username')
   private onUsernameChanged(val: string, oldVal: string) {
-    this.$store.dispatch('updateUsername', {id: this.$store.state.userId, username: val})
+    this.$store.dispatch('updatePlayerName', {id: this.$store.state.userId, name: val})
   }
 }
 </script>

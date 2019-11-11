@@ -1,4 +1,4 @@
-import { Hero, Player, SelectPayload, Team } from '@/store/types'
+import { Hero, Player, PlayerNamePayload, SelectPayload, Team } from '@/store/types'
 import { defaultHeros } from '@/variables'
 import uuid from 'uuid/v4'
 import Vue from 'vue'
@@ -30,27 +30,17 @@ export default new Vuex.Store<RootState>({
       store.sessionId = sessionId
       // Send event to join specific session
       // @ts-ignore
-      this._vm.$socket.client.emit('session', sessionId)
+      // this._vm.$socket.client.emit('session', sessionId)
     },
-    username({ userId, players, sessionId }, payload: { id: string; username: string }) {
+    playerName({ userId, players, sessionId }, payload: { id: string; name: string }) {
       const user = players.find((player: Player) => player.id === payload.id)
       if (!user) return
-      user.name = payload.username
-      if (user.name && user.team !== null) {
-        // TODO: add User to players
-        // @ts-ignore
-        this._vm.$socket.client.emit('addPlayer', { sessionId, id: user.id, name: user.name, team: user.team })
-      }
-      localStorage.setItem('username', payload.username)
+      user.name = payload.name
     },
-    team({ userId, players, sessionId }, team: Team) {
-      const user = players.find((player: Player) => player.id === userId)
+    team({ players, sessionId }, payload: { id: string; team: Team }) {
+      const user = players.find((player: Player) => player.id === payload.id)
       if (!user) return
-      if (user) user.team = team
-      if (user.name && user.team !== null) {
-        // @ts-ignore
-        this._vm.$socket.client.emit('addPlayer', { sessionId, id: user.id, name: user.name, team: user.team })
-      }
+      user.team = payload.team
     },
     selectHero({ userId, players }, heroId: number) {
       const user = players.find((player: Player) => player.id === userId)
@@ -77,17 +67,62 @@ export default new Vuex.Store<RootState>({
         user.selectedId = null
       }
     },
-    addPlayer({ players }, player) {
+    addPlayer({ players, userId, sessionId }, player) {
       players.push(player)
     },
   },
   actions: {
-    updateUsername(context, payload: { id: string; username: string }) {
-      context.commit('username', payload)
+    initPlayers({ commit, state: { players, userId, sessionId } }, playersPayload: Player[]) {
+      // A. no current players in session: add ourselves to players and emit socket event
+      // B. current players in session
+      //  1. We are in players: add all players, emit no events
+      //  2. We are not in players: add all players, add ourselves to players, emit event
+      // If we aren't included in current session Players, add ourselves
+      // If we aren't included in current session Players, add ourselves
+      if (!playersPayload.flatMap((player: Player) => player.id).includes(userId)) {
+        playersPayload.forEach((player: Player) => {
+          players.push(player)
+        })
+        // Add ourselves to players and emit
+        const user: Player = {
+          bannedIds: [],
+          id: userId,
+          name: localStorage.getItem('username') || '',
+          selectedId: null,
+          team: null,
+        }
+        players.push(user)
+        // @ts-ignore
+        this._vm.$socket.client.emit('addPlayer', {
+          sessionId,
+          bannedIds: user.bannedIds,
+          id: user.id,
+          name: user.name,
+          selectedId: user.selectedId,
+          team: user.team,
+        })
+      } else {
+        playersPayload.forEach((player: Player) => {
+          commit('addPlayer', player)
+        })
+      }
+    },
+    updatePlayerName({ commit, state: { sessionId }, getters: { user } }, payload: PlayerNamePayload) {
+      // Update username
+      commit('playerName', payload)
+      if (payload.id === user.id) {
+        // @ts-ignore
+        this._vm.$socket.client.emit('updatePlayerName', { sessionId, id: user.id, name: user.name })
+        localStorage.setItem('username', payload.name)
+      }
     },
     // Select team color
-    updateTeam(context, payload: { id: string; team: Team }) {
-      context.commit('team', payload)
+    updateTeam({ commit, state: {sessionId},  getters: { user } }, payload: { id: string; team: Team }) {
+      commit('team', payload)
+      if (payload.id === user.id) {
+        // @ts-ignore
+        this._vm.$socket.client.emit('updatePlayerTeam', { sessionId, id: user.id, team: user.team })
+      }
     },
     // Select / Deselect heros
     updateSelected({ commit, state: { heros, players }, getters: { user } }, payload: SelectPayload) {
