@@ -26,7 +26,7 @@ import Hero from '@/components/Hero.vue'
 import TeamPanel from '@/components/Team/index.vue'
 import { Player, Team } from '@/store/types'
 import { Component, Vue } from 'vue-property-decorator'
-import VueSocketIOExt, { Socket } from 'vue-socket.io-extended'
+
 @Component({
   components: {
     ControlPanel,
@@ -42,11 +42,11 @@ export default class App extends Vue {
     })
     this.$socket.$subscribe('updatePlayerName', (payload: { id: string; name: string }) => {
       console.log('updatePlayerName ', payload)
-      this.$store.dispatch('updatePlayerName', payload)
+      this.$store.commit('playerName', payload)
     })
     this.$socket.$subscribe('updatePlayerTeam', (payload: { id: string; team: Team }) => {
       console.log('updatePlayerTeam ', payload)
-      this.$store.dispatch('updateTeam', payload)
+      this.$store.commit('team', payload)
     })
     this.$socket.$subscribe('updateSelectedHero', (payload: { id: string; heroId: number }) => {
       console.log('updateSelectedHero ', payload)
