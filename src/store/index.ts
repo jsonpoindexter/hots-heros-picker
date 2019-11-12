@@ -1,5 +1,5 @@
 import { Hero, Player, PlayerNamePayload, SelectPayload, Team } from '@/store/types'
-import { defaultHeros } from '@/variables'
+import { defaultHeros, defaultMaps } from '@/variables'
 import uuid from 'uuid/v4'
 import Vue from 'vue'
 import Vuex from 'vuex'
@@ -10,6 +10,7 @@ interface RootState {
   sessionId: string
   userId: string
   heros: Hero[]
+  maps: Hero[]
   players: Player[]
 }
 
@@ -19,6 +20,7 @@ export default new Vuex.Store<RootState>({
     sessionId: '',
     userId: localStorage.getItem('userId') || '',
     heros: JSON.parse(JSON.stringify(defaultHeros)),
+    maps: JSON.parse(JSON.stringify(defaultMaps)),
     players: [],
   },
   mutations: {

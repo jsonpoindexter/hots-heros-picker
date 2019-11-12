@@ -1,3 +1,21 @@
+export let defaultMaps = [
+  { name: 'Alterac Pass', urlName: 'alterac-pass' },
+  { name: 'Garden of Terror', urlName: 'garden-of-terror' },
+  { name: 'Hanamura Temple', urlName: 'hanamura' },
+  { name: 'Volskaya Foundry', urlName: 'volskaya' },
+  { name: 'Haunted Mines', urlName: 'haunted-mines' },
+  { name: 'Towers of Doom', urlName: 'towers-of-doom' },
+  { name: 'Infernal Shrines', urlName: 'infernal-shrines' },
+  { name: 'Battlefield of Eternity', urlName: 'battlefield-of-eternity' },
+  { name: 'Tomb of the Spider Queen', urlName: 'tomb-of-the-spider-queen' },
+  { name: 'Sky Temple', urlName: 'sky-temple' },
+  { name: "Blackheart's Bay", urlName: 'blackhearts-bay' },
+  { name: 'Dragon Shire', urlName: 'dragon-shire' },
+  { name: 'Cursed Hollow', urlName: 'cursed-hollow' },
+  { name: 'Braxis Holdout', urlName: 'braxis-holdout' },
+  { name: 'Warhead Junction', urlName: 'warhead-junction' },
+]
+
 export let defaultHeros = [
   { name: 'Anduin', urlName: 'anduin' },
   { name: 'Imperius', urlName: 'imperius' },

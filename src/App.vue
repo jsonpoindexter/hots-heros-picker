@@ -3,6 +3,8 @@
     <h1 style="user-select: none;">HoTS Draft Picker</h1>
     <ControlPanel></ControlPanel>
     <TeamPanel />
+    <h4>Maps</h4>
+    <Map v-for="map in maps" :map="map"/>
     <div class="heros-wrapper">
       <div class="heros">
         <Hero
@@ -26,9 +28,11 @@ import Hero from '@/components/Hero.vue'
 import TeamPanel from '@/components/Team/index.vue'
 import { Player, Team } from '@/store/types'
 import { Component, Vue } from 'vue-property-decorator'
+import Map from '@/components/Map.vue'
 
 @Component({
   components: {
+    Map,
     ControlPanel,
     Hero,
     TeamPanel,
@@ -59,6 +63,10 @@ export default class App extends Vue {
   }
   get heros() {
     return this.$store.state.heros
+  }
+
+  get maps() {
+    return this.$store.state.maps
   }
 
   get selectedHerosId() {
