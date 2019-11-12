@@ -50,11 +50,11 @@ export default class App extends Vue {
     })
     this.$socket.$subscribe('updateSelectedHero', (payload: { id: string; heroId: number }) => {
       console.log('updateSelectedHero ', payload)
-      this.$store.dispatch('updateSelected', payload)
+      this.$store.commit('selectHero', payload)
     })
     this.$socket.$subscribe('updateBannedHero', (payload: { id: string; heroId: number }) => {
       console.log('updateBannedHero ', payload)
-      this.$store.dispatch('updateBanned', payload)
+      this.$store.commit('banHero', payload)
     })
   }
   get heros() {
