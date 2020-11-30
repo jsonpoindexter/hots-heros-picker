@@ -9,7 +9,7 @@ import { Component, Vue, Watch } from 'vue-property-decorator'
 
 @Component({})
 export default class UsernameInput extends Vue {
-  private username: string = localStorage.getItem('username') || ''
+  private username: string = this.$store.getters.user.name || localStorage.getItem('username') || ''
   @Watch('username')
   private onUsernameChanged(val: string, oldVal: string) {
     this.$store.dispatch('updatePlayerName', {id: this.$store.state.userId, name: val})
