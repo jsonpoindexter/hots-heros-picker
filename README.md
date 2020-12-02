@@ -1,5 +1,7 @@
 # hots-heros-picker
 
+http://hotsdraft.jasonpoindexter.io/
+
 ## Project setup
 ```
 npm install
